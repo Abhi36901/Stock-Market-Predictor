@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Stock Market Predictor</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ==========================================
+         HEADER
+         ========================================== -->
+
+    <div class="header">
+
+        <h1>Stock Market Predictor</h1>
+
+        <p>
+            Machine-learning powered market forecasting
+        </p>
+
+    </div>
+
+
+    <!-- ==========================================
+         SEARCH
+         ========================================== -->
+
+    <form
+        method="GET"
+        action="/"
+        class="search"
+    >
+
+        <input
+            type="text"
+            name="ticker"
+            id="ticker"
+            list="stocks"
+            placeholder="Search a company or ticker..."
+            autocomplete="off"
+            required
+        >
+
+
+        <datalist id="stocks">
+
+            <option value="AAPL">
+                Apple (AAPL)
+            </option>
+
+            <option value="TSLA">
+                Tesla (TSLA)
+            </option>
+
+            <option value="NVDA">
+                NVIDIA (NVDA)
+            </option>
+
+            <option value="GOOGL">
+                Google / Alphabet (GOOGL)
+            </option>
+
+            <option value="ADBE">
+                Adobe (ADBE)
+            </option>
+
+            <option value="MSFT">
+                Microsoft (MSFT)
+            </option>
+
+            <option value="AMZN">
+                Amazon (AMZN)
+            </option>
+
+            <option value="META">
+                Meta (META)
+            </option>
+
+            <option value="NFLX">
+                Netflix (NFLX)
+            </option>
+
+        </datalist>
+
+
+        <button type="submit">
+            Predict
+        </button>
+
+    </form>
+
+
+    <!-- ==========================================
+         POPULAR STOCKS
+         ========================================== -->
+
+    {% if not result %}
+
+    <div class="suggested-section">
+
+        <h2>Popular Stocks</h2>
+
+        <p class="suggested-subtitle">
+            Choose a stock to start predicting
+        </p>
+
+
+        <div class="suggested-grid">
+
+
+            <!-- APPLE -->
+
+            <form
+                method="GET"
+                action="/"
+                class="stock-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="ticker"
+                    value="AAPL"
+                >
+
+                <button
+                    type="submit"
+                    class="stock-card"
+                >
+
+                    <div class="stock-logo">
+                        A
+                    </div>
+
+                    <div class="stock-info">
+
+                        <div class="stock-name">
+                            Apple
+                        </div>
+
+                        <div class="stock-ticker">
+                            AAPL
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </form>
+
+
+            <!-- TESLA -->
+
+            <form
+                method="GET"
+                action="/"
+                class="stock-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="ticker"
+                    value="TSLA"
+                >
+
+                <button
+                    type="submit"
+                    class="stock-card"
+                >
+
+                    <div class="stock-logo">
+                        T
+                    </div>
+
+                    <div class="stock-info">
+
+                        <div class="stock-name">
+                            Tesla
+                        </div>
+
+                        <div class="stock-ticker">
+                            TSLA
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </form>
+
+
+            <!-- NVIDIA -->
+
+            <form
+                method="GET"
+                action="/"
+                class="stock-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="ticker"
+                    value="NVDA"
+                >
+
+                <button
+                    type="submit"
+                    class="stock-card"
+                >
+
+                    <div class="stock-logo">
+                        N
+                    </div>
+
+                    <div class="stock-info">
+
+                        <div class="stock-name">
+                            NVIDIA
+                        </div>
+
+                        <div class="stock-ticker">
+                            NVDA
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </form>
+
+
+            <!-- GOOGLE -->
+
+            <form
+                method="GET"
+                action="/"
+                class="stock-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="ticker"
+                    value="GOOGL"
+                >
+
+                <button
+                    type="submit"
+                    class="stock-card"
+                >
+
+                    <div class="stock-logo">
+                        G
+                    </div>
+
+                    <div class="stock-info">
+
+                        <div class="stock-name">
+                            Google
+                        </div>
+
+                        <div class="stock-ticker">
+                            GOOGL
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </form>
+
+
+            <!-- ADOBE -->
+
+            <form
+                method="GET"
+                action="/"
+                class="stock-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="ticker"
+                    value="ADBE"
+                >
+
+                <button
+                    type="submit"
+                    class="stock-card"
+                >
+
+                    <div class="stock-logo">
+                        A
+                    </div>
+
+                    <div class="stock-info">
+
+                        <div class="stock-name">
+                            Adobe
+                        </div>
+
+                        <div class="stock-ticker">
+                            ADBE
+                        </div>
+
+                    </div>
+
+                </button>
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ==========================================
+         RESULTS
+         ========================================== -->
+
+    {% if result %}
+
+    <div class="result">
+
+
+        <!-- ==========================================
+             STOCK TITLE
+             ========================================== -->
+
+        <div class="stock-title">
+
+            {{ result.ticker }}
+
+        </div>
+
+
+        <!-- ==========================================
+             MAIN CARDS
+             ========================================== -->
+
+        <div class="cards">
+
+
+            <!-- CURRENT PRICE -->
+
+            <div class="card">
+
+                <div class="card-label">
+                    Current Price
+                </div>
+
+                <div class="card-value">
+                    ${{ result.current_price }}
+                </div>
+
+            </div>
+
+
+            <!-- NEXT DAY PRICE -->
+
+            <div class="card">
+
+                <div class="card-label">
+                    Predicted Next Day
+                </div>
+
+                <div class="card-value">
+                    ${{ result.predicted_price }}
+                </div>
+
+            </div>
+
+
+            <!-- EXPECTED CHANGE -->
+
+            <div class="card">
+
+                <div class="card-label">
+                    Expected Change
+                </div>
+
+                <div class="card-value">
+
+                    {{ result.expected_change_percent }}%
+
+                </div>
+
+            </div>
+
+
+            <!-- NEWS SENTIMENT -->
+
+            <div class="card">
+
+                <div class="card-label">
+                    News Sentiment
+                </div>
+
+                <div class="card-value">
+
+                    {{ result.news_sentiment }}
+
+                </div>
+
+                <div
+                    class="sentiment-label
+                    {% if result.news_sentiment > 0.05 %}
+                        positive
+                    {% elif result.news_sentiment < -0.05 %}
+                        negative
+                    {% else %}
+                        neutral
+                    {% endif %}"
+                >
+
+                    {% if result.news_sentiment > 0.05 %}
+
+                        Positive
+
+                    {% elif result.news_sentiment < -0.05 %}
+
+                        Negative
+
+                    {% else %}
+
+                        Neutral
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- DIRECTION -->
+
+            <div class="card">
+
+                <div class="card-label">
+                    Direction
+                </div>
+
+                <div class="card-value">
+
+                    {% if result.direction == "UP" %}
+
+                        ↑ UP
+
+                    {% else %}
+
+                        ↓ DOWN
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- CONFIDENCE -->
+
+            <div class="card">
+
+                <div class="card-label">
+                    Confidence
+                </div>
+
+                <div class="card-value">
+
+                    {{ result.confidence }}%
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ==========================================
+             DIRECTION PROBABILITY
+             ========================================== -->
+
+        <div class="probability-card">
+
+            <div class="card-label">
+                Direction Probability
+            </div>
+
+
+            <div class="probability-row">
+
+
+                <div class="probability-item">
+
+                    <span>
+                        UP
+                    </span>
+
+                    <strong>
+                        {{ result.up_probability }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="probability-item">
+
+                    <span>
+                        DOWN
+                    </span>
+
+                    <strong>
+                        {{ result.down_probability }}%
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="probability-bar">
+
+                <div
+                    class="probability-up"
+                    style="width: {{ result.up_probability }}%;"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             PRICE HISTORY
+             ========================================== -->
+
+        <div class="chart-section">
+
+            <h2>
+                Price History
+            </h2>
+
+            <div class="chart-container">
+
+                <canvas id="priceChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             5-DAY FORECAST
+             ========================================== -->
+
+        <div class="forecast">
+
+            <h2>
+                5-Day Forecast
+            </h2>
+
+
+            <div class="forecast-grid">
+
+
+                {% for price in result.forecast %}
+
+                <div class="forecast-card">
+
+                    <div class="forecast-day">
+
+                        Day {{ loop.index }}
+
+                    </div>
+
+
+                    <div class="forecast-price">
+
+                        ${{ price }}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             30-DAY TREND
+             ========================================== -->
+
+        <div class="trend-section">
+
+            <h2>
+                30-Day Trend
+            </h2>
+
+
+            <div class="trend-card">
+
+
+                <div class="trend-item">
+
+                    <span>
+                        Current Price
+                    </span>
+
+                    <strong>
+                        ${{ result.current_price }}
+                    </strong>
+
+                </div>
+
+
+                <div class="trend-arrow">
+                    →
+                </div>
+
+
+                <div class="trend-item">
+
+                    <span>
+                        Projected Price
+                    </span>
+
+                    <strong>
+                        ${{ result.predicted_30_day_price }}
+                    </strong>
+
+                </div>
+
+
+                <div class="trend-item">
+
+                    <span>
+                        Expected Change
+                    </span>
+
+                    <strong
+                        class="
+                        {% if result.expected_30_day_change_percent > 0 %}
+                            positive
+                        {% elif result.expected_30_day_change_percent < 0 %}
+                            negative
+                        {% else %}
+                            neutral
+                        {% endif %}
+                        "
+                    >
+
+                        {{ result.expected_30_day_change_percent }}%
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             OVERALL PREDICTION
+             ========================================== -->
+
+        <div class="overall-section">
+
+            <h2>
+                Overall Prediction
+            </h2>
+
+
+            <div class="overall-card">
+
+
+                <div class="overall-label">
+                    Market Outlook
+                </div>
+
+
+                <div
+                    class="overall-value
+                    {% if result.overall_prediction == 'BULLISH' %}
+                        positive
+                    {% elif result.overall_prediction == 'BEARISH' %}
+                        negative
+                    {% else %}
+                        neutral
+                    {% endif %}"
+                >
+
+                    {% if result.overall_prediction == "BULLISH" %}
+
+                        ↑ BULLISH
+
+                    {% elif result.overall_prediction == "BEARISH" %}
+
+                        ↓ BEARISH
+
+                    {% else %}
+
+                        → NEUTRAL
+
+                    {% endif %}
+
+                </div>
+
+
+                <p class="overall-description">
+
+                    Based on the model's direction prediction,
+                    30-day price trend and current news sentiment.
+
+                </p>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             NEWS
+             ========================================== -->
+
+        <div class="news-section">
+
+
+            <h2>
+                News Sentiment
+            </h2>
+
+
+            <!-- OVERALL SENTIMENT -->
+
+            <div class="news-sentiment-card">
+
+
+                <div class="card-label">
+                    Overall Sentiment
+                </div>
+
+
+                <div class="news-main-score">
+
+                    {{ result.news_sentiment }}
+
+                </div>
+
+
+                <div
+                    class="
+                    sentiment-label
+
+                    {% if result.news_sentiment > 0.05 %}
+                        positive
+
+                    {% elif result.news_sentiment < -0.05 %}
+                        negative
+
+                    {% else %}
+                        neutral
+                    {% endif %}
+                    "
+                >
+
+                    {% if result.news_sentiment > 0.05 %}
+
+                        Positive
+
+                    {% elif result.news_sentiment < -0.05 %}
+
+                        Negative
+
+                    {% else %}
+
+                        Neutral
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+            <h3>
+                Latest News
+            </h3>
+
+
+            <div class="news-list">
+
+
+                {% for article in result.news[:5] %}
+
+                <div class="news-item">
+
+
+                    <div class="news-title">
+
+                        {{ article.title }}
+
+                    </div>
+
+
+                    <div class="news-score">
+
+                        Sentiment:
+                        {{ article.sentiment }}
+
+                    </div>
+
+
+                </div>
+
+                {% endfor %}
+
+
+                {% if not result.news %}
+
+                <div class="no-news">
+
+                    No recent news available.
+
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ==========================================
+         CHART JAVASCRIPT
+         ========================================== -->
+
+    <script>
+
+        const history =
+            {{ result.history | tojson }};
+
+
+        const labels =
+            history.map(
+                item => item.date
+            );
+
+
+        const prices =
+            history.map(
+                item => item.price
+            );
+
+
+        const ctx =
+            document
+                .getElementById("priceChart")
+                .getContext("2d");
+
+
+        new Chart(
+            ctx,
+            {
+
+                type: "line",
+
+
+                data: {
+
+                    labels: labels,
+
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "{{ result.ticker }} Price",
+
+                            data: prices,
+
+                            borderWidth: 2,
+
+                            pointRadius: 0,
+
+                            tension: 0.25,
+
+                            fill: false
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+
+                    interaction: {
+
+                        mode: "index",
+
+                        intersect: false
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display: true
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            ticks: {
+
+                                maxTicksLimit: 8
+
+                            }
+
+                        },
+
+
+                        y: {
+
+                            beginAtZero: false
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+    {% endif %}
+
+
+</div>
+
+</body>
+
+</html>
